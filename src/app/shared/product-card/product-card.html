@@ -1,0 +1,14 @@
+<a class="card" [routerLink]="['/product', product().id]">
+  <div class="card__media">
+    @if (product().isNew) {
+      <span class="card__badge">New</span>
+    }
+    <img [src]="product().image" [alt]="product().name" loading="lazy" />
+  </div>
+
+  <div class="card__row">
+    <h3 class="card__name">{{ product().name }}</h3>
+    <span class="card__price">LKR {{ product().price | number }}</span>
+  </div>
+  <p class="card__category">{{ product().category }}</p>
+</a>
