@@ -1,0 +1,29 @@
+<header class="header">
+  <div class="container header__inner">
+    <a routerLink="/" class="header__logo">Furnova<span>.</span></a>
+
+    <nav class="header__nav" aria-label="Main navigation">
+      <a routerLink="/">Home</a>
+      <a routerLink="/" class="active">Shop</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </nav>
+
+    <div class="header__actions">
+      <button type="button" aria-label="Search">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20 20l-3.5-3.5" />
+        </svg>
+      </button>
+
+      <button type="button" class="cart" aria-label="Cart">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 8h14l-1 12H6L5 8z" />
+          <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+        </svg>
+        <span class="cart__badge">{{ cartCount() }}</span>
+      </button>
+    </div>
+  </div>
+</header>
