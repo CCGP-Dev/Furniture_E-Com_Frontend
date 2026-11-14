@@ -1,0 +1,185 @@
+@if (product(); as p) {
+  <section class="detail">
+    <div class="container">
+      <nav class="crumbs" aria-label="Breadcrumb">
+        <a routerLink="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <a routerLink="/" (click)="service.category.set(p.category)">{{ p.category }}</a>
+        <span aria-hidden="true">/</span>
+        <span class="crumbs__current" aria-current="page">{{ p.name }}</span>
+      </nav>
+
+      <div class="detail__grid">
+        <!-- Image -->
+        <div class="gallery">
+          <img [src]="p.image" [alt]="p.name" />
+        </div>
+
+        <!-- Info -->
+        <div class="info">
+          <p class="info__label">Furnova Original</p>
+          <h1 class="info__title">{{ p.name }}</h1>
+          <p class="info__price">LKR {{ p.price | number }}</p>
+
+          <p class="info__stock" [class.info__stock--out]="!p.inStock">
+            <span class="info__dot"></span>
+            {{ p.inStock ? 'In stock · Ready to deliver' : 'Out of stock · Currently unavailable' }}
+          </p>
+
+          @if (p.description) {
+            <p class="info__desc">{{ p.description }}</p>
+          }
+
+          <div class="specs">
+            @if (p.woodType) {
+              <div class="specs__row">
+                <span>Wood type</span>
+                <strong>{{ p.woodType }}</strong>
+              </div>
+            }
+
+            @if (p.finishes; as finishes) {
+              <div class="specs__row">
+                <span>Finish</span>
+                <strong>{{ selectedFinish()?.name }}</strong>
+              </div>
+              <div class="swatches" role="radiogroup" aria-label="Finish">
+                @for (f of finishes; track f.name) {
+                  <button
+                    type="button"
+                    role="radio"
+                    class="swatch"
+                    [class.swatch--active]="f.name === selectedFinish()?.name"
+                    [attr.aria-checked]="f.name === selectedFinish()?.name"
+                    [attr.aria-label]="f.name"
+                    [style.background]="f.color"
+                    (click)="selectedFinish.set(f)"
+                  ></button>
+                }
+              </div>
+            }
+          </div>
+
+          <div class="buy">
+            <div class="qty">
+              <button type="button" aria-label="Decrease quantity" [disabled]="quantity() <= 1" (click)="changeQty(-1)">−</button>
+              <span aria-live="polite">{{ quantity() }}</span>
+              <button type="button" aria-label="Increase quantity" [disabled]="quantity() >= 10" (click)="changeQty(1)">+</button>
+            </div>
+
+            <button type="button" class="buy__add" [disabled]="!p.inStock" (click)="addToCart(p)">
+              <span>{{ !p.inStock ? 'Unavailable' : added() ? 'Added ✓' : 'Add to cart' }}</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 8h14l-1 12H6L5 8z" />
+                <path d="M9 8V6a3 3 0 0 1 6 0v2" />
+              </svg>
+            </button>
+          </div>
+
+                    <div class="delivery">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 6h11v10H2z" />
+              <path d="M13 9h4l3 3v4h-7z" />
+              <circle cx="6" cy="18" r="1.8" />
+              <circle cx="17" cy="18" r="1.8" />
+            </svg>
+            <div>
+              <strong>Delivery in 5–8 working days</strong>
+              <span>Calculated by district at checkout</span>
+            </div>
+          </div>
+
+          <div class="acc">
+            <!-- Dimensions -->
+            <div class="acc__item">
+              <button
+                type="button"
+                class="acc__head"
+                [attr.aria-expanded]="openSection() === 'dimensions'"
+                (click)="toggleSection('dimensions')"
+              >
+                <span>Description &amp; dimensions</span>
+                <span class="acc__icon" [class.acc__icon--open]="openSection() === 'dimensions'" aria-hidden="true"></span>
+              </button>
+              @if (openSection() === 'dimensions') {
+                <div class="acc__body">
+                  @if (p.dimensions; as d) {
+                    <table class="dims">
+                      <tbody>
+                        <tr><th scope="row">Width</th><td>{{ d.width }} cm</td></tr>
+                        <tr><th scope="row">Depth</th><td>{{ d.depth }} cm</td></tr>
+                        <tr><th scope="row">Height</th><td>{{ d.height }} cm</td></tr>
+                        @if (d.seatHeight) {
+                          <tr><th scope="row">Seat height</th><td>{{ d.seatHeight }} cm</td></tr>
+                        }
+                      </tbody>
+                    </table>
+                  } @else {
+                    <p>Dimensions will be available soon.</p>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Materials & care -->
+            <div class="acc__item">
+              <button
+                type="button"
+                class="acc__head"
+                [attr.aria-expanded]="openSection() === 'care'"
+                (click)="toggleSection('care')"
+              >
+                <span>Materials &amp; care</span>
+                <span class="acc__icon" [class.acc__icon--open]="openSection() === 'care'" aria-hidden="true"></span>
+              </button>
+              @if (openSection() === 'care') {
+                <div class="acc__body">
+                  <p><strong>Material:</strong> {{ p.material }}@if (p.woodType) { · {{ p.woodType }} }</p>
+                  <p>{{ p.care || 'Care instructions will be available soon.' }}</p>
+                </div>
+              }
+            </div>
+
+            <!-- Delivery & warranty -->
+            <div class="acc__item">
+              <button
+                type="button"
+                class="acc__head"
+                [attr.aria-expanded]="openSection() === 'delivery'"
+                (click)="toggleSection('delivery')"
+              >
+                <span>Delivery &amp; warranty</span>
+                <span class="acc__icon" [class.acc__icon--open]="openSection() === 'delivery'" aria-hidden="true"></span>
+              </button>
+              @if (openSection() === 'delivery') {
+                <div class="acc__body">
+                  <p>Islandwide delivery in 5–8 working days. Our team will call you to arrange a delivery time.</p>
+                  <p>Every Furnova piece comes with a 2-year warranty against manufacturing defects.</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+            @if (related().length) {
+        <section class="related">
+          <p class="related__label">Pairs beautifully with</p>
+          <h2 class="related__title">Complete the room</h2>
+
+          <div class="related__grid">
+            @for (item of related(); track item.id) {
+              <app-product-card [product]="item" />
+            }
+          </div>
+        </section>
+      }
+    </div>
+  </section>
+} @else {
+  <section class="container notfound">
+    <h1>Piece not found</h1>
+    <p>We couldn't find that item. It may have been removed.</p>
+    <a routerLink="/" class="notfound__link">Back to the collection</a>
+  </section>
+}

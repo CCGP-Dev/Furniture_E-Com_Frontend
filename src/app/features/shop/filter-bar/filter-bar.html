@@ -1,0 +1,74 @@
+<section class="filters">
+  <div class="container">
+    <div class="filters__bar">
+      <label class="filters__search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20 20l-3.5-3.5" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Search products"
+          aria-label="Search products"
+          [value]="service.searchTerm()"
+          (input)="onSearch($event)"
+        />
+      </label>
+
+      <div class="filters__group">
+        <div class="filters__select">
+          <select aria-label="Category" [value]="service.category()" (change)="onSelect(service.category, $event)">
+            <option value="">Category</option>
+            @for (c of categories; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filters__select">
+          <select aria-label="Material" [value]="service.material()" (change)="onSelect(service.material, $event)">
+            <option value="">Material</option>
+            @for (m of materials; track m) {
+              <option [value]="m">{{ m }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filters__select">
+          <select aria-label="Price" [value]="service.price()" (change)="onSelect(service.price, $event)">
+            <option value="">Price</option>
+            @for (p of priceRanges; track p) {
+              <option [value]="p">{{ p }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filters__select">
+          <select aria-label="Availability" [value]="service.stock()" (change)="onSelect(service.stock, $event)">
+            <option value="">Availability</option>
+            @for (a of availability; track a) {
+              <option [value]="a">{{ a }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="filters__sort filters__select">
+        <select aria-label="Sort by" [value]="service.sort()" (change)="onSelect(service.sort, $event)">
+          @for (s of sortOptions; track s) {
+            <option [value]="s">{{ s }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div class="filters__meta">
+      <span>{{ service.filteredProducts().length }} pieces</span>
+      @if (service.hasActiveFilters()) {
+        <button type="button" class="filters__clear" (click)="service.clearFilters()">
+          Clear filters
+        </button>
+      }
+    </div>
+  </div>
+</section>
