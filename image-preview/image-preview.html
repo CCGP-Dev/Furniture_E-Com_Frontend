@@ -1,0 +1,116 @@
+<div class="preview">
+  <div class="preview__stage">
+    @if (currentSrc(); as src) {
+      @if (status() === 'loading') {
+        <div class="preview__skeleton" aria-hidden="true"></div>
+      }
+
+      @if (status() !== 'error') {
+        <img
+          class="preview__img"
+          [class.preview__img--ready]="status() === 'loaded'"
+          [class.preview__img--zoomable]="status() === 'loaded'"
+          [src]="src"
+          [alt]="mainAlt()"
+          decoding="async"
+          fetchpriority="high"
+          (load)="onLoad(current()!)"
+          (error)="onError(current()!)"
+          (click)="open()"
+        />
+      }
+    }
+
+    @if (status() === 'missing' || status() === 'error') {
+      <div class="preview__fallback" role="status">
+        <svg width="72" height="72" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M14 30v-8a8 8 0 0 1 8-8h20a8 8 0 0 1 8 8v8" />
+          <path d="M8 34a6 6 0 0 1 12 0v4h24v-4a6 6 0 0 1 12 0v12H8z" />
+          <path d="M14 46v6M50 46v6" />
+        </svg>
+        @if (status() === 'missing') {
+          <p class="preview__message">Photo coming soon</p>
+          <p class="preview__hint">We haven't added an image for {{ alt() }} yet.</p>
+        } @else {
+          <p class="preview__message">This image couldn't be loaded</p>
+          <p class="preview__hint">Check your connection and try again.</p>
+          <button type="button" class="preview__retry" (click)="retry()">Try again</button>
+        }
+      </div>
+    }
+
+    @if (status() === 'loaded') {
+      <button type="button" class="preview__enlarge" (click)="open()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+        </svg>
+        <span>Enlarge</span>
+        <span class="visually-hidden">image of {{ alt() }}</span>
+      </button>
+    }
+
+    @if (thumbs().length > 1) {
+      <span class="preview__count" aria-hidden="true">{{ position() }} / {{ thumbs().length }}</span>
+    }
+  </div>
+
+  @if (thumbs().length > 1) {
+    <div class="preview__thumbs" role="group" aria-label="Product images">
+      @for (t of thumbs(); track t.url) {
+        <button
+          type="button"
+          class="thumb"
+          [class.thumb--active]="t.index === selectedIndex()"
+          [attr.aria-pressed]="t.index === selectedIndex()"
+          [attr.aria-label]="'Show view ' + (t.index + 1)"
+          (click)="select(t.index)"
+        >
+          <img [src]="t.url" alt="" decoding="async" (error)="onError(t.url)" />
+        </button>
+      }
+    </div>
+  }
+</div>
+
+@if (lightboxOpen()) {
+  <div
+    class="viewer"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="'Enlarged image of ' + alt()"
+    (click)="close()"
+  >
+    <button
+      #closeButton
+      type="button"
+      class="viewer__close"
+      aria-label="Close enlarged image"
+      (click)="$event.stopPropagation(); close()"
+    >
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <path d="M5 5l14 14M19 5L5 19" />
+      </svg>
+    </button>
+
+    @if (thumbs().length > 1) {
+      <button type="button" class="viewer__nav viewer__nav--prev" aria-label="Previous image" (click)="$event.stopPropagation(); step(-1)">‹</button>
+      <button type="button" class="viewer__nav viewer__nav--next" aria-label="Next image" (click)="$event.stopPropagation(); step(1)">›</button>
+    }
+
+    @if (status() === 'error') {
+      <div class="viewer__fallback" (click)="$event.stopPropagation()">
+        <p>This image couldn't be loaded.</p>
+        <button type="button" class="preview__retry" (click)="retry()">Try again</button>
+      </div>
+    } @else if (currentSrc(); as src) {
+      <img
+        class="viewer__img"
+        [src]="src"
+        [alt]="mainAlt()"
+        (load)="onLoad(current()!)"
+        (error)="onError(current()!)"
+        (click)="$event.stopPropagation()"
+      />
+    }
+  </div>
+}
