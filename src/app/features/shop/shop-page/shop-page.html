@@ -13,9 +13,40 @@
 
 <app-filter-bar />
 
-<section class="products">
+<section class="products" aria-live="polite">
   <div class="container">
-    @if (products().length) {
+    @if (service.usingFallbackData()) {
+      <div class="catalog-notice" role="status">
+        <span>Showing offline showroom sample catalog while the backend API is unavailable.</span>
+        <button type="button" class="catalog-notice__btn" (click)="service.loadProducts()">
+          Reconnect to Live API
+        </button>
+      </div>
+    }
+
+    @if (service.isLoading()) {
+      <div class="state-box state-box--loading" role="status">
+        <div class="spinner" aria-hidden="true"></div>
+        <h2 class="state-box__title">Loading the Furnova collection</h2>
+        <p class="state-box__text">
+          Retrieving handcrafted furniture pieces from the showroom catalog...
+        </p>
+      </div>
+    } @else if (service.errorMessage()) {
+      <div class="state-box state-box--error" role="alert">
+        <p class="state-box__eyebrow">Connection Issue</p>
+        <h2 class="state-box__title">Unable to load products</h2>
+        <p class="state-box__text">{{ service.errorMessage() }}</p>
+        <div class="state-box__actions">
+          <button type="button" class="btn btn--primary" (click)="service.loadProducts()">
+            Retry Connection
+          </button>
+          <button type="button" class="btn btn--secondary" (click)="service.useSampleCatalog()">
+            Load Showroom Sample Catalog
+          </button>
+        </div>
+      </div>
+    } @else if (products().length) {
       <div class="products__grid">
         @for (product of products(); track product.id) {
           <app-product-card [product]="product" />
@@ -28,7 +59,23 @@
         (pageChange)="service.goToPage($event)"
       />
     } @else {
-      <p class="products__empty">No pieces match your filters.</p>
+      <div class="state-box state-box--empty">
+        <h2 class="state-box__title">No furniture pieces found</h2>
+        <p class="state-box__text">
+          @if (service.hasActiveFilters()) {
+            No pieces match your current search or filter selection. Try adjusting or resetting your filters.
+          } @else {
+            The showroom catalog is currently empty. Please check back soon for new arrivals.
+          }
+        </p>
+        @if (service.hasActiveFilters()) {
+          <div class="state-box__actions">
+            <button type="button" class="btn btn--secondary" (click)="service.clearFilters()">
+              Reset All Filters
+            </button>
+          </div>
+        }
+      </div>
     }
   </div>
 </section>
