@@ -52,6 +52,7 @@ export class ProductDetail {
 
   addToCart(p: Product) {
     this.cart.add(p, this.quantity(), this.selectedFinish()?.name);
+    this.cart.open();
     this.added.set(true);
     setTimeout(() => this.added.set(false), 1800);
   }

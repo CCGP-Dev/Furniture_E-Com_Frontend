@@ -9,5 +9,10 @@ import { CartService } from '../../core/services/cart';
   styleUrl: './header.scss',
 })
 export class Header {
-  cartCount = inject(CartService).count;
+  private readonly cart = inject(CartService);
+  cartCount = this.cart.count;
+
+  openCart() {
+    this.cart.open();
+  }
 }
