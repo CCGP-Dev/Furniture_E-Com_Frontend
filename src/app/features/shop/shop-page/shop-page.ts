@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ProductService } from '../../../core/services/product';
 import { ProductCard } from '../../../shared/product-card/product-card';
 import { FilterBar } from '../filter-bar/filter-bar';
@@ -10,7 +10,11 @@ import { Pagination } from '../../../shared/pagination/pagination';
   templateUrl: './shop-page.html',
   styleUrl: './shop-page.scss',
 })
-export class ShopPage {
+export class ShopPage implements OnInit {
   readonly service = inject(ProductService);
   products = this.service.pagedProducts;
+
+  ngOnInit(): void {
+    this.service.loadProducts();
+  }
 }
